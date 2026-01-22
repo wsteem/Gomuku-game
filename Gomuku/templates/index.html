@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gomoku Localhost</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .board { 
+            grid-template-columns: repeat({{n}}, 40px); 
+        }
+    </style>
+</head>
+<body>
+    <h1>Gomoku</h1>
+    
+    <div class="controls">
+        <label for="machine-type">Opponent:</label>
+        <select id="machine-type">
+            <option value="1">Random Machine</option>
+            <option value="2" selected>Smart Machine</option>
+        </select>
+        <button onclick="resetGame()">Reset Game</button>
+    </div>
+
+    <div class="board" id="board">
+        {% for r in range(m) %}
+            {% for c in range(n) %}
+                <div class="cell" onclick="makeMove({{r}}, {{c}})" id="cell-{{r}}-{{c}}"></div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <h2 id="status">Your Turn (Black Stones)</h2>
+
+    <script>
+        let gameOver = false;
+
+        function makeMove(r, c) {
+            if(gameOver) return;
+
+            // Get the current machine setting from the dropdown
+            const machineOption = document.getElementById('machine-type').value;
+
+            fetch('/move', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    row: r, 
+                    col: c, 
+                    option: machineOption
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'error') return;
+                
+                // 1. Place Human Stone (O)
+                const humanCell = document.getElementById(`cell-${r}-${c}`);
+                if (!humanCell.innerHTML) {
+                    humanCell.innerHTML = '<div class="stone-O"></div>';
+                }
+                
+                if(data.status === 'win') {
+                    // If Machine made the winning move, place it before alerting
+                    if(data.winner === 'Machine') {
+                        document.getElementById(`cell-${data.r}-${data.c}`).innerHTML = '<div class="stone-X"></div>';
+                    }
+                    document.getElementById('status').innerText = data.winner + " WINS!";
+                    gameOver = true;
+                    // Small delay so the stone appears before the alert pops up
+                    setTimeout(() => alert(data.winner + " Wins!"), 100);
+                } else {
+                    // 2. Place Machine Stone (X)
+                    const machineCell = document.getElementById(`cell-${data.mr}-${data.mc}`);
+                    machineCell.innerHTML = '<div class="stone-X"></div>';
+                }
+            });
+        }
+
+        function resetGame() {
+            fetch('/reset', { method: 'POST' })
+            .then(() => {
+                // Reload the page to clear the board visually
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>
