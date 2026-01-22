@@ -1,7 +1,7 @@
 # Gomoku Game
 A Python-based Gomoku (Five-in-a-Row) game with a Smart Machine opponent.
 
-![Gomoku Gameplay](https://raw.githubusercontent.com/wsteem/Gomoku-game/main/Gomoku/images/gomukuimage.png)
+<img src="https://raw.githubusercontent.com/wsteem/Gomoku-game/main/Gomoku/images/gomukuimage.png" width="600">
 
 ## How to Play
 1. Install requirements: `pip install flask`
