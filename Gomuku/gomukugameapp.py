@@ -8,7 +8,6 @@ class GomokuGame:
         self.m = m
         self.n = n
         self.board = [[' ']*n for _ in range(m)]
-        # Track last human move to use in your original blocking logic
         self.input_row = 0
         self.input_col = 0
 
@@ -57,7 +56,7 @@ class GomokuGame:
         ])
 
     def smart_machine_move(self):
-        # 1. Block immediate human win (Your 'if max_pos < 5' loop)
+        # 1. Block immediate human win 
         for r in range(self.m):
             for c in range(self.n):
                 if self.board[r][c] == ' ':
